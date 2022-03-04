@@ -1,0 +1,24 @@
+version: "3.9"
+
+services:
+  cronpose:
+    build: ..
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+  hello-world:
+    image: hello-world
+    labels:
+      com.mtoohey.cronpose: "* * * * *"
+  yello-world:
+    image: hello-world
+    labels:
+      com.mtoohey.cronpose: "* * * * *"
+  jello-world:
+    image: hello-world
+    labels:
+      com.mtoohey.cronpose: "* * * * *"
+  cello-world:
+    image: hello-world
+    labels:
+      com.mtoohey.cronpose: "* * * * *"
