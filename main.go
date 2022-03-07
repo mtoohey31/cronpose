@@ -57,7 +57,13 @@ func main() {
 		log.Error().Msgf("response status %d while listing containers", status)
 	}
 	c := cron.New()
-	for _, container := range containers {
+	for _, currContainer := range containers {
+		// NOTE: this is required because the loop values are passed by reference
+		// otherwise, and go reuses the same loop variable, and this will result in
+		// the cron function running multiple times for the last container instead
+		// of once for each
+		container := currContainer
+
 		schedule, ok := container.Labels["cronpose"]
 		if !ok {
 			schedule = container.Labels["com.mtoohey.cronpose"]
