@@ -42,14 +42,17 @@ func makeReqest(conn *net.UnixConn, method string, url string, body io.Reader, v
 	if err != nil {
 		log.Fatal().Msg(err.Error())
 	}
-	resBody, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal().Msg(err.Error())
-	}
 
-	err = json.Unmarshal(resBody, &v)
-	if err != nil {
-		log.Fatal().Msg(err.Error())
+	if v != nil {
+		resBody, err := io.ReadAll(res.Body)
+		if err != nil {
+			log.Fatal().Msg(err.Error())
+		}
+
+		err = json.Unmarshal(resBody, &v)
+		if err != nil {
+			log.Fatal().Msg(err.Error())
+		}
 	}
 
 	return res.StatusCode
