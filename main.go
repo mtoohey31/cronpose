@@ -16,11 +16,11 @@ import (
 func connect() *net.UnixConn {
 	addr, err := net.ResolveUnixAddr("unix", "/var/run/docker.sock")
 	if err != nil {
-		log.Fatal().Str("stage", "resolving docker socket").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	conn, err := net.DialUnix("unix", nil, addr)
 	if err != nil {
-		log.Fatal().Str("stage", "connecting to docker socket").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	return conn
 }
@@ -28,23 +28,23 @@ func connect() *net.UnixConn {
 func makeReqest(conn *net.UnixConn, method string, url string, body io.Reader, v interface{}) int {
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		log.Fatal().Str("operation", "request").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	err = req.Write(conn)
 	if err != nil {
-		log.Fatal().Str("operation", "request").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	res, err := http.ReadResponse(bufio.NewReader(conn), req)
 	if err != nil {
-		log.Fatal().Str("operation", "request").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal().Str("operation", "request").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	err = json.Unmarshal(resBody, &v)
 	if err != nil {
-		log.Fatal().Str("operation", "request").Err(err)
+		log.Fatal().Msg(err.Error())
 	}
 	return res.StatusCode
 }
@@ -62,7 +62,7 @@ func main() {
 		if !ok {
 			schedule = container.Labels["com.mtoohey.cronpose"]
 		}
-		log.Info().Msgf("detected container %v", container.Names)
+		log.Info().Msgf("detected container %v with schedule %s", container.Names, schedule)
 		_, err := c.AddFunc(schedule, func() {
 			log.Info().Msgf("starting container %v", container.Names)
 			status := makeReqest(conn, http.MethodPost, fmt.Sprintf("http://localhost/containers/%s/start", container.ID), nil, nil)
@@ -71,7 +71,7 @@ func main() {
 			}
 		})
 		if err != nil {
-			log.Err(err).Str("stage", "registering cron jobs")
+			log.Error().Msg(err.Error())
 		}
 	}
 	c.Start()
