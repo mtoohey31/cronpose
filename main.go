@@ -58,6 +58,14 @@ func makeReqest(conn *net.UnixConn, method string, url string, body io.Reader, v
 	return res.StatusCode
 }
 
+func nameOrID(c types.Container) string {
+	if len(c.Names) > 0 {
+		return c.Names[0]
+	} else {
+		return c.ID
+	}
+}
+
 func main() {
 	conn := connect()
 
@@ -80,14 +88,14 @@ func main() {
 			schedule = container.Labels["com.mtoohey.cronpose"]
 		}
 
-		log.Info().Msgf("detected container %v with schedule %s", container.Names, schedule)
+		log.Info().Msgf("detected container %v with schedule %s", nameOrID(container), schedule)
 
 		_, err := c.AddFunc(schedule, func() {
-			log.Info().Msgf("starting container %v", container.Names)
+			log.Info().Msgf("starting container %v", nameOrID(container))
 
 			status := makeReqest(conn, http.MethodPost, fmt.Sprintf("http://localhost/containers/%s/start", container.ID), nil, nil)
 			if status != http.StatusNoContent && status != http.StatusNotModified {
-				log.Error().Msgf("response status %d while starting container %v", status, container.Names)
+				log.Error().Msgf("response status %d while starting container %v", status, nameOrID(container))
 			}
 		})
 		if err != nil {
