@@ -91,9 +91,6 @@ func main() {
 			log.Error().Msg(err.Error())
 		}
 	}
-	c.Start()
-	wait := make(chan struct{})
-	for {
-		<-wait
-	}
+
+	c.Run()
 }
