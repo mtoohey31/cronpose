@@ -1,3 +1,5 @@
+> Archived because I no longer have a use-case for this, though I might eventually start working on it again if one arises.
+
 # cronpose
 
 Schedule docker containers with labels in your compose file.
